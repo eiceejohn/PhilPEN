@@ -1,0 +1,25 @@
+# Verification notes
+
+Verified during implementation on 29 October 2026; final package prepared 3 November 2026.
+
+- All application JavaScript files passed syntax checks.
+- Browser UI: created a disposable patient, saved an assessment, confirmed age 60 on the birthday, BMI 33.3 and source-workbook category Obese, and checked updated counts.
+- Reloading preserved patient and assessment records in native IndexedDB.
+- Period filtering and age/sex reports produced the expected results.
+- Equipment inventory saving was tested and a form field naming collision was repaired and retested.
+- Settings persisted after a reload.
+- Excel and JSON downloads were triggered through the UI. The downloaded Excel was read back with openpyxl; the expected six sheets and senior-female count were present.
+- JSON merge and replace restoration were exercised through the UI. Disposable preview records were removed using a clean restore fixture.
+- 21 isolated native IndexedDB checks passed, including orphan rejection, atomic batches, cascade deletion, merge/replace and rollback of invalid restores.
+- Reporting tests covered CSV round trips, optional DOB, identifiers with leading zeroes, quoted/multiline values, formula-like text, period deduplication, age boundaries, medication totals and XLSX read-back for populated, empty and filtered reports.
+- The source workbook was left unchanged. No test patients, databases or test fixtures are included in the application folder.
+
+## Verification limits
+
+Browser interaction tests used the local HTTP preview because the automated browser blocks file URLs. The app itself uses classic local scripts and relative assets, with no fetch, module import, CDN, server API or build step needed at runtime. Direct file opening in the user's Edge/Chrome profile was not automated. The desktop layout was visually inspected; the preview browser did not apply the requested narrow viewport, so mobile rendering was not visually verified.
+
+This is a single-device browser-local database. It does not provide server synchronization, user accounts or application-level encryption. Keep regular JSON backups.
+
+## Blue theme update · 3 November 2026
+
+Updated branding, surfaces, charts, focus states, avatars, favicon and Excel report styles to blue and slate. Warning and error colors remain distinct. All CSS custom-property references resolve. Layout and data logic are unchanged. This color-only revision received static validation; live browser review was unavailable because Windows browser automation could not verify the current URL.

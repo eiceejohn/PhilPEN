@@ -1,0 +1,19 @@
+# Local records and exports
+backups/
+PhilPEN-backup-*.json
+*.csv
+*.xlsx
+*.xls
+*.db
+*.sqlite
+*.sqlite3
+*.zip
+
+# Local development and private configuration
+node_modules/
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+work/
