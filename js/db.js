@@ -127,6 +127,9 @@
         date: date(input.date, 'Assessment date', true),
         datePrecision: choice(input.datePrecision, 'Date precision', ['day', 'month'], 'day'),
         age: number(input.age, 'Age', 20, 120, true),
+        riskAssessed: input.riskAssessed === undefined ? true : bool(input.riskAssessed, 'Risk assessed'),
+        htnMedicationProvided: input.htnMedicationProvided == null ? null : bool(input.htnMedicationProvided, 'Antihypertensive medication provided'),
+        dmMedicationProvided: input.dmMedicationProvided == null ? null : bool(input.dmMedicationProvided, 'Antidiabetic medication provided'),
         smoker: bool(input.smoker, 'Smoking status'),
         bingeDrinker: bool(input.bingeDrinker, 'Binge drinking status'),
         inactive: bool(input.inactive, 'Physical inactivity'),
@@ -142,6 +145,10 @@
         remarks: text(input.remarks, 'Remarks', 5000),
         nextVisit: date(input.nextVisit, 'Next visit', false)
       };
+      for (const [condition, provided, source] of [['hypertension','htnMedicationProvided','htnSource'],['diabetes','dmMedicationProvided','dmSource']]) {
+        if(row[provided] === true && !row[condition]) fail('Select '+condition+' before marking medication provided.');
+        if(row[provided] === false && row[source]) fail('Medication source must be blank when medication was not provided.');
+      }
       if (row.nextVisit && row.nextVisit < row.date) fail('Next visit cannot be earlier than the assessment date.');
     } else if (store === 'equipment') {
       row = {
@@ -164,6 +171,7 @@
         targetRate: number(input.targetRate, 'Target rate', 0, 1, false, 0.4),
         contactName: text(input.contactName, 'Contact name', 160),
         contactPhone: text(input.contactPhone, 'Contact phone', 60),
+        viber: text(input.viber, 'Viber number', 60),
         email: text(input.email, 'Email', 254)
       };
       if (row.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row.email)) fail('Enter a valid email address.');

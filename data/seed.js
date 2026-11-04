@@ -10,6 +10,7 @@ window.PHILPEN_SEED = {
     "targetRate": 0.4,
     "contactName": "SALLY MARIE PINIONES",
     "contactPhone": "09068515669",
+    "viber": "09068515669",
     "email": "binangonanrizalnoncom@gmail.com"
   },
   "barangays": [

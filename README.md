@@ -14,9 +14,11 @@ Walang kailangang i-install. Walang server, internet connection, account, CDN o 
 
 - **Patients:** magdagdag o mag-edit ng patient, pagkatapos ay mag-record ng assessment. May hiwalay na assessment history bawat patient.
 - **Assessments:** ilagay ang petsa, risk factors, measurements, hypertension/diabetes status at gamot na kasalukuyang iniinom. Kapag kumpleto ang weight at height, awtomatikong kukuwentahin ang BMI category gamit ang source workbook thresholds. Kung kulang ang measurements, puwedeng piliin ang naitalang category. Ang medicine entry ay frequency kada araw, hindi bilang ng stock o reseta.
+- **NCD indicators:** may explicit Risk assessed at Yes/No medication-provided fields para sa HTN at DM. May live preview ng lahat ng 15 indicator columns; automatic ang age/sex group. Sa old records, retained ang dating treatment inference hanggang maglagay ng explicit Yes/No.
+- **Medications:** hiwalay na page para sa lahat ng 12 workbook medication fields, per-patient editing at frequency totals.
 - **Reports:** piliin ang reporting period at barangay, tingnan ang indicators, at i-export ang report workbook o CSV.
 - **Equipment:** i-update ang bilang ng BP apparatus, glucometer at glucose test strips kada barangay.
-- **Settings:** baguhin ang facility information, contact details, eligible population at screening target kung kailangan.
+- **Settings:** baguhin ang facility information, contact details kasama ang Viber number, eligible population at screening target kung kailangan.
 - **CSV import:** i-download muna ang patient CSV template, sundin ang column headings, at i-import ang completed file. Puwedeng blank ang DOB kung hindi alam; ilagay ang edad sa bawat assessment. Patient demographics ang CSV import; JSON backup ang gamit para sa buong database at assessment history.
 - **Backup:** gamitin ang **Back up your data** para mag-download ng JSON. Gamitin ang restore control para ibalik ang backup. Ang merge ay mag-a-update ng parehong record IDs; ang replace ay papalit sa kasalukuyang database kapag kinumpirma.
 
@@ -26,7 +28,7 @@ Ginagamit ng reports ang kasalukuyang patient name, sex at barangay. Kapag itina
 
 ## Excel import at Tagpos masterlist
 
-Sa **Patient registry → Import Excel**, pumili ng `.xlsx` o `.xls` na sumusunod sa supplied PhilPEN masterlist layout (FAMILY NAME at D13, FIRST NAME at E13, data from row 16). I-review ang bilang, preview at source notes bago pindutin ang **Import records**. Lahat ng populated matching worksheets ay binabasa. Blank templates at Legend ay nilalaktawan. Kapag may invalid row, walang ise-save hangga’t hindi naitatama ang file. Repeated imports skip matching patients and same-date visits; hindi nito pinapalitan ang existing edits. I-edit sa app ang existing record kung may correction.
+Sa **Patient registry → Import Excel**, pumili ng `.xlsx` o `.xls` na sumusunod sa supplied PhilPEN masterlist layout (FAMILY NAME / FIRST NAME on row 10 or 13, data three rows below). I-review ang bilang, preview at source notes bago pindutin ang **Import records**. Lahat ng populated matching worksheets ay binabasa. Blank templates at Legend ay nilalaktawan. Kapag may invalid row, walang ise-save hangga’t hindi naitatama ang file. Repeated imports skip matching patients and same-date visits; hindi nito pinapalitan ang existing edits. I-edit sa app ang existing record kung may correction.
 
 Sa supplied workbook, ang sheet na `June` ay may heading na **SEPTEMBER 2026**. May 158 exact assessment dates na September 1 at 246 blank assessment dates. Ang blank dates ay month-only records; internally ginagamit ang September 1 para sa sorting, pero month lang ang ipinapakita at ini-export. May 76 ages na hindi tugma sa birth date; pinanatili ang source age at may note sa assessment. Source BMI categories are retained.
 
@@ -63,3 +65,7 @@ Naka-seed ang tunay na municipal settings at **40 barangays**. Ang eligible popu
 | `docs/` | Architecture, database API at workbook findings |
 
 Developer notes: [Architecture](docs/architecture.md), [Database](docs/database.md), [Reporting](docs/reporting.md), [Workbook analysis](docs/workbook-analysis.md).
+
+## Updated workbook review
+
+Compared against PhilPEN-Dashboard (1).xlsx. See [field coverage](docs/workbook-field-audit.md) for all source sections, added controls and supported import layouts. The new workbook is a blank patient template; it does not replace the 404 existing Tagpos records. Use JSON backup/restore for a complete database roundtrip including explicit provided-status fields; source masterlist imports infer those statuses when the workbook has no dedicated status column.

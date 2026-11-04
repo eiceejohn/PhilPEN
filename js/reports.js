@@ -53,6 +53,8 @@
     const condition = type === 'HTN' ? assessment.hypertension : assessment.diabetes;
     const source = type === 'HTN' ? assessment.htnSource : assessment.dmSource;
     const medications = type === 'HTN' ? HTN_MEDICATIONS : DM_MEDICATIONS;
+    const provided = type === 'HTN' ? assessment.htnMedicationProvided : assessment.dmMedicationProvided;
+    if (provided !== undefined && provided !== null) return !!condition && provided === true;
     return !!condition && (['facility', 'out-of-pocket', 'both'].includes(source) || medications.some(key => frequency(assessment, key) > 0));
   }
 
@@ -95,25 +97,25 @@
       ['smoker', 'bingeDrinker', 'inactive', 'unhealthyDiet'].forEach(key => { if (assessment[key]) riskCounts[key] += 1; });
       if (assessment.bmiClass === 'overweight') riskCounts.overweight += 1;
       if (assessment.bmiClass === 'obese') riskCounts.obese += 1;
-      byGroup[groupKey(assessment)] += 1;
+      if (assessment.riskAssessed !== false) byGroup[groupKey(assessment)] += 1;
       const row = barangayMap.get(assessment.patient.barangay);
-      if (row) row.screened += 1;
+      if (row && assessment.riskAssessed !== false) row.screened += 1;
       if (assessment.hypertension) { hypertensive += 1; if (row) row.hypertensive += 1; }
       if (assessment.diabetes) { diabetic += 1; if (row) row.diabetic += 1; }
       if (treated(assessment, 'HTN')) treatedHTN += 1;
       if (treated(assessment, 'DM')) treatedDM += 1;
     });
-    const monthly = MONTHS.map((_, index) => latestPeople(yearEncounters.filter(assessment => Number(assessment.date.slice(5, 7)) === index + 1)).filter(eligible).length);
-    return { assessments: encounters, people, screened: people.length, hypertensive, diabetic, treatedHTN, treatedDM, riskCounts, monthly, byBarangay, byGroup, excluded: allPeople.length - people.length };
+    const monthly = MONTHS.map((_, index) => latestPeople(yearEncounters.filter(assessment => Number(assessment.date.slice(5, 7)) === index + 1)).filter(a => eligible(a) && a.riskAssessed !== false).length);
+    return { assessments: encounters, people, screened: people.filter(a => a.riskAssessed !== false).length, hypertensive, diabetic, treatedHTN, treatedDM, riskCounts, monthly, byBarangay, byGroup, excluded: allPeople.length - people.length };
   }
 
   function metricFlags(assessment) {
-    return [true, assessment.smoker, assessment.bingeDrinker, assessment.inactive, assessment.unhealthyDiet,
+    return [assessment.riskAssessed !== false, assessment.smoker, assessment.bingeDrinker, assessment.inactive, assessment.unhealthyDiet,
       assessment.bmiClass === 'overweight', assessment.bmiClass === 'obese', assessment.hypertension,
-      treated(assessment, 'HTN'), assessment.hypertension && sourceMatches(assessment.htnSource, 'facility'),
-      assessment.hypertension && sourceMatches(assessment.htnSource, 'out-of-pocket'), assessment.diabetes,
-      treated(assessment, 'DM'), assessment.diabetes && sourceMatches(assessment.dmSource, 'facility'),
-      assessment.diabetes && sourceMatches(assessment.dmSource, 'out-of-pocket')];
+      treated(assessment, 'HTN'), treated(assessment, 'HTN') && sourceMatches(assessment.htnSource, 'facility'),
+      treated(assessment, 'HTN') && sourceMatches(assessment.htnSource, 'out-of-pocket'), assessment.diabetes,
+      treated(assessment, 'DM'), treated(assessment, 'DM') && sourceMatches(assessment.dmSource, 'facility'),
+      treated(assessment, 'DM') && sourceMatches(assessment.dmSource, 'out-of-pocket')];
   }
 
   function normalizedContext(context) {
@@ -248,14 +250,14 @@
   }
 
   function encounterTable(context) {
-    const headers = ['Assessment ID', 'Patient ID', 'Date assessed', 'Last name', 'First name', 'Middle name', 'Suffix', 'Sex', 'Age at assessment', 'Date of birth', 'Barangay', 'Address', 'PhilHealth number', 'Phone', 'Current tobacco use', 'Binge drinking', 'Insufficient physical activity', 'Unhealthy diet', 'Weight (kg)', 'Height (m)', 'Recorded BMI category', 'Hypertension', 'Type II Diabetes', 'HTN medication source', 'DM medication source', ...MEDICATIONS.map(medication => medication[1] + ' frequency/day'), 'Remarks', 'Next visit'];
+    const headers = ['Assessment ID', 'Patient ID', 'Date assessed', 'Last name', 'First name', 'Middle name', 'Suffix', 'Sex', 'Age at assessment', 'Date of birth', 'Barangay', 'Address', 'PhilHealth number', 'Phone', 'Current tobacco use', 'Binge drinking', 'Insufficient physical activity', 'Unhealthy diet', 'Weight (kg)', 'Height (m)', 'Recorded BMI category', 'Hypertension', 'Type II Diabetes', 'HTN medication source', 'DM medication source', ...MEDICATIONS.map(medication => medication[1] + ' frequency/day'), 'Remarks', 'Next visit', 'Risk assessed', 'Antihypertensive medication provided', 'Antidiabetic medication provided'];
     const fields = ['id', 'patientId', 'date', 'lastName', 'firstName', 'middleName', 'suffix', 'sex', 'age', 'dob', 'barangay', 'address', 'philhealth', 'phone'];
     const rows = context.summary.assessments.map(assessment => {
       const patient = assessment.patient;
       return [assessment.id, patient.id, assessment.datePrecision === 'month' ? assessment.date.slice(0,7) : assessment.date, patient.lastName, patient.firstName, patient.middleName, patient.suffix, patient.sex, assessment.age == null ? '' : assessment.age, patient.dob, patient.barangay, patient.address, patient.philhealth, patient.phone,
         ...['smoker', 'bingeDrinker', 'inactive', 'unhealthyDiet'].map(key => assessment[key] ? 1 : 0),
         assessment.weightKg == null ? '' : assessment.weightKg, assessment.heightM == null ? '' : assessment.heightM, assessment.bmiClass || '', assessment.hypertension ? 1 : 0, assessment.diabetes ? 1 : 0, assessment.htnSource || '', assessment.dmSource || '',
-        ...MEDICATIONS.map(medication => frequency(assessment, medication[0])), assessment.remarks || '', assessment.nextVisit || ''];
+        ...MEDICATIONS.map(medication => frequency(assessment, medication[0])), assessment.remarks || '', assessment.nextVisit || '', assessment.riskAssessed !== false ? 1 : 0, assessment.htnMedicationProvided == null ? 'Inferred from recorded source/medicines' : assessment.htnMedicationProvided ? 'Yes' : 'No', assessment.dmMedicationProvided == null ? 'Inferred from recorded source/medicines' : assessment.dmMedicationProvided ? 'Yes' : 'No'];
     });
     return { headers, fields, rows };
   }
@@ -317,7 +319,7 @@
     const third = ['', '', '20–59 yrs.', '≥60 yrs.', '20–59 yrs.', '≥60 yrs.', '20–59 yrs.', '≥60 yrs.', '20–59 yrs.', '≥60 yrs.', '5 mg', '10 mg', '50 mg', '100 mg', '', '', '', '', '', 'R', 'NPH', '70/30'];
     const rows = context.names.map(name => {
       const people = context.summary.people.filter(assessment => assessment.patient.barangay === name);
-      const row = [name, people.length, ...Array(24).fill(0)];
+      const row = [name, people.filter(a => a.riskAssessed !== false).length, ...Array(24).fill(0)];
       people.forEach(assessment => {
         const group = (assessment.patient.sex === 'F' ? 2 : 0) + (assessment.age >= 60 ? 1 : 0);
         if (assessment.hypertension) row[2 + group] += 1;
@@ -371,7 +373,7 @@
       row[13] = excelDate(patient.dob); row[14] = patient.barangay; row[15] = patient.address || ''; row[16] = patient.philhealth || '';
       const blockGroup = sex * 2 + (assessment.age >= 60 ? 1 : 0);
       const flags = [assessment.smoker, assessment.bingeDrinker, assessment.inactive, assessment.unhealthyDiet, assessment.bmiClass === 'overweight', assessment.bmiClass === 'obese', assessment.hypertension, assessment.diabetes,
-        assessment.hypertension && sourceMatches(assessment.htnSource, 'out-of-pocket'), assessment.diabetes && sourceMatches(assessment.dmSource, 'out-of-pocket'), assessment.hypertension && sourceMatches(assessment.htnSource, 'facility'), assessment.diabetes && sourceMatches(assessment.dmSource, 'facility')];
+        treated(assessment, 'HTN') && sourceMatches(assessment.htnSource, 'out-of-pocket'), treated(assessment, 'DM') && sourceMatches(assessment.dmSource, 'out-of-pocket'), treated(assessment, 'HTN') && sourceMatches(assessment.htnSource, 'facility'), treated(assessment, 'DM') && sourceMatches(assessment.dmSource, 'facility')];
       blocks.forEach((column, blockIndex) => { if (flags[blockIndex]) { const col = columnIndex(column) - 1 + blockGroup; row[col] = 1; totals[col] += 1; } });
       row[33] = assessment.weightKg == null ? '' : assessment.weightKg; row[34] = assessment.heightM == null ? '' : assessment.heightM;
       MEDICATIONS.forEach((medication, medicationIndex) => { const value = frequency(assessment, medication[0]); row[67 + medicationIndex] = value || ''; totals[67 + medicationIndex] += value; });
@@ -390,11 +392,11 @@
       ['HYPERTENSION & DIABETES PATIENT DASHBOARD'], ['Reporting period', periodLabel(context.filters)], ['Reporting barangay', context.filters.barangay === 'all' ? 'All barangays' : context.filters.barangay],
       ['Province', settings.province || ''], ['LGU', settings.lgu || ''], ['Facility', settings.facility || ''], ['Facility address', settings.address || ''],
       ['Total eligible population 20+', Number(settings.eligiblePopulation) || 0], ['Target proportion', Number(settings.targetRate) || 0],
-      ['Contact person', settings.contactName || ''], ['Contact number', settings.contactPhone || ''], ['Email address', settings.email || ''], [],
+      ['Contact person', settings.contactName || ''], ['Contact number', settings.contactPhone || ''], ['Viber number', settings.viber || ''], ['Email address', settings.email || ''], [],
       ['Barangay', 'Male 20+', 'Female 20+', 'Total 20+', 'Annual target', 'Monthly target', 'Quarterly target', 'Facility'],
       ...context.barangays.filter(barangay => context.names.includes(barangay.name)).map(barangay => [barangay.name, barangay.male, barangay.female, barangay.total, barangay.annual, barangay.monthly, barangay.quarterly, barangay.facility || ''])
     ];
-    return { name: 'MUNICIPAL INFO', rows, columns: 8, headerRows: [1, 14], heights: { 1: 35, 8: 32, 14: 38 }, widths: [[1, 1, 35], [2, 7, 16], [8, 8, 40]], merges: ['A1:H1', ...[2, 3, 4, 5, 6, 7, 10, 11, 12].map(row => `B${row}:H${row}`)], freeze: 14 };
+    return { name: 'MUNICIPAL INFO', rows, columns: 8, headerRows: [1, 15], heights: { 1: 35, 8: 32, 15: 38 }, widths: [[1, 1, 35], [2, 7, 16], [8, 8, 40]], merges: ['A1:H1', ...[2, 3, 4, 5, 6, 7, 10, 11, 12, 13].map(row => `B${row}:H${row}`)], freeze: 15 };
   }
 
   function makeNotesSheet(context) {
@@ -404,12 +406,13 @@
       ['Counted population', 'Patients aged 20–59 or 60+ at the encounter, with recorded sex M/F. Age is saved at assessment or calculated from DOB and assessment date, never from today.'],
       ['One person per reporting period', 'NCD INDICATORS, NCD MEDICATION and the submission register use the latest assessment per patient within the selected period. For identical dates, updated/created time and assessment ID break ties.'],
       ['Patient demographics', 'Reports use the current patient name, sex and barangay. Corrections to the patient registry also change historical report labels and aggregates. Assessment age remains the saved age at that visit.'],
+      ['Explicit assessment fields', 'Risk assessed controls the screening indicator. Medication provided Yes/No takes precedence over inferred treatment; legacy records infer from medication source or medicines. Age/sex groups are derived from the patient and recorded assessment age.'],
       ['Month-only assessments', 'YYYY-MM means the exact visit day was not recorded. These visits use day 01 only for internal sorting and month filters.'],
       ['Encounter history', 'ENCOUNTERS includes every matching assessment, including follow-ups. It is separate from the deduplicated submission register.'],
       ['Uncounted latest records', context.summary.excluded], ['Assessed people', context.summary.screened], ['Recorded encounters', context.summary.assessments.length],
       ['Monthly trend', 'Each calendar month counts unique eligible patients independently. Summing monthly counts can exceed annual unique patients.'],
       ['Recorded classifications', 'BMI category, hypertension and Type II Diabetes are explicitly recorded assessment fields. This report does not assign diagnoses or infer BMI categories.'],
-      ['Medication treatment', 'A recorded condition plus a relevant medication frequency above zero or a recorded medication source counts as treated. Statins alone do not count as antihypertensive treatment.'],
+      ['Medication treatment', 'A recorded condition plus explicit medication-provided Yes counts as treated. Explicit No excludes treatment. When unset, relevant medicine frequency or a recorded source is used; statins alone do not count for HTN.'],
       ['Medication sources', 'Both contributes to facility and out-of-pocket counts. These categories overlap and must not be added as a unique total.'],
       ['Medication totals', 'NCD MEDICATION columns K–V sum recorded daily frequencies (0–3), matching the source register medication totals. They are not distinct patient counts, dispensed quantities or stock balances.'],
       ['Equipment', 'Current inventory at export time. Blank means no recorded inventory for that barangay; zero means recorded zero. Historical period filters do not reconstruct historical inventory.'],
@@ -470,5 +473,5 @@
     return { ...downloadBlob(blob, 'PhilPEN-report-' + filePeriod(context.filters) + '.xlsx'), summary: context.summary };
   }
 
-  global.PhilReports = Object.freeze({ summarize, exportWorkbook, buildWorkbookBytes, exportPatientsCSV, parsePatientsCSV, downloadPatientTemplate, exportIndicatorsCSV, exportEncountersCSV, encounterAge, frequency, treated, riskLabels: RISK_LABELS, medicationColumns: MEDICATIONS, patientFields: PATIENT_FIELDS, toCSV });
+  global.PhilReports = Object.freeze({ summarize, indicatorLabels: INDICATOR_LABELS, metricFlags, exportWorkbook, buildWorkbookBytes, exportPatientsCSV, parsePatientsCSV, downloadPatientTemplate, exportIndicatorsCSV, exportEncountersCSV, encounterAge, frequency, treated, riskLabels: RISK_LABELS, medicationColumns: MEDICATIONS, patientFields: PATIENT_FIELDS, toCSV });
 })(typeof window !== 'undefined' ? window : globalThis);

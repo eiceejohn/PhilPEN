@@ -8,9 +8,10 @@ The reports use the field order in the supplied **PhilPEN-Dashboard.xlsx**. The 
 - Screening, risk, condition, treatment, medication and submission totals use the **latest assessment per patient within that period**. A follow-up does not count the patient twice. Assessments on the same day are ordered by updated/created timestamp, then ID.
 - The report includes patients aged **20–59** and **60+** with recorded sex M/F. The age saved at assessment is authoritative. When absent, age is calculated using date of birth and assessment date. It is never recalculated using today's date.
 - Reports use current patient names, sex and barangay. Registry corrections also change historical report labels and aggregates; saved age at assessment is retained.
-- The 12 monthly trend values count unique patients within each month of the selected year and barangay. The month filter affects the other report values. Monthly counts can add to more than the annual unique count.
+- Screening totals, age/sex screening groups and monthly trend count records whose `riskAssessed` is not false (legacy records default to true). Other recorded indicators are counted independently.
+- The 12 monthly trend values count unique risk-assessed patients within each month of the selected year and barangay. The month filter affects the other report values. Monthly counts can add to more than the annual unique count.
 - BMI categories, hypertension and Type II Diabetes come from recorded fields. Reports do not assign diagnoses or calculate a BMI classification.
-- Treated hypertension means recorded hypertension and either a recorded HTN medication source or a nonzero frequency for amlodipine, losartan or hydrochlorothiazide. Statins alone are not counted as antihypertensive treatment. Diabetes treatment uses the corresponding source or metformin, gliclazide or insulin.
+- Explicit `htnMedicationProvided` / `dmMedicationProvided` Yes/No takes precedence; a matching condition is required. When unset, legacy treatment inference applies. In that case, treated hypertension means recorded hypertension and either a recorded HTN medication source or a nonzero frequency for amlodipine, losartan or hydrochlorothiazide. Statins alone are not counted as antihypertensive treatment. Diabetes treatment uses the corresponding source or metformin, gliclazide or insulin.
 - A source recorded as `both` contributes to both facility and out-of-pocket counts. Those source columns overlap.
 - Medication totals sum the recorded daily frequencies, matching the source register's 1/2/3 entries and SUM totals. They are **not** dispensed quantities, stock balances or a count of distinct patients taking each medicine.
 - Equipment values are current inventory at export time, independent of the period filter. Blank means no inventory has been recorded; zero means a recorded zero.
@@ -20,7 +21,7 @@ The reports use the field order in the supplied **PhilPEN-Dashboard.xlsx**. The 
 
 The download contains six sheets:
 
-1. **MUNICIPAL INFO** — report scope, reporting-area settings, contact person/number/email and barangay population/target baseline.
+1. **MUNICIPAL INFO** — report scope, reporting-area settings, contact person/number/Viber/email and barangay population/target baseline.
 2. **NCD INDICATORS** — A: barangay; B:AE: adult indicators; AF:BI: senior indicators. Each indicator is male then female. There are 60 numeric indicator columns. Data begins at row 4.
 3. **NCD MEDICATION** — A:B: barangay/screened; C:F: hypertension by sex and age; G:J: diabetes by sex and age; K:V: the 12 medications; W:Z: equipment. Data begins at row 5.
 4. **eto yung format na pinapasa** — source-aligned A:CC register, with totals in row 12 and people from row 13. A and CC are reserved empty columns in the source. This export fills the corresponding age/sex columns individually rather than retaining the source's merged data-entry blocks.

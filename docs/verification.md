@@ -34,3 +34,10 @@ Updated branding, surfaces, charts, focus states, avatars, favicon and Excel rep
 - All 29 isolated native IndexedDB checks passed, including atomic linked imports, rollback, identity matching, preservation of existing edits and one-time starter loading.
 - Passed .xlsx/.xls parsing, malformed date, sex, barangay, measurement, medication and risk-flag rejection; month-only Excel export roundtrip; existing report regression checks.
 - Patient seed and unmodified original workbook included for public upload at the owner’s explicit request after disclosure of the patient data and repository visibility.
+
+## 2026-11-04 — complete NCD field review
+
+- Compared all five sheets of PhilPEN-Dashboard (1).xlsx. Added explicit risk-assessed and HTN/DM medication-provided controls, 15-indicator live preview and on-screen report matrix, dedicated 12-field medication page, and Viber contact field.
+- Added header detection for dashboard row 10 and Tagpos row 13; medication mappings follow the actual headers, including dashboard Atorvastatin and Hydrochlorothiazide.
+- Passed all 60 age/sex indicator cell checks, 12 dashboard medication column checks, legacy defaults, invalid statuses, Viber/ENCOUNTERS export checks, Tagpos regression and existing report tests.
+- All 32 isolated native IndexedDB checks passed, including new-field backup/restore and medication persistence. Browser preview verified medication layout, 15 indicator rows, source counts, live group changes, and validation. A discard dialog blocked cleanup of the unsaved form test tab; no patient changes were committed.

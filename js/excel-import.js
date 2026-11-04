@@ -12,13 +12,16 @@ function barangay(v){const s=key(v).replace(/^(brgy\.?|barangay)\s*/,'');const f
 function parseWorkbook(wb){
  const result={patients:[],assessments:[],errors:[],warnings:[],sheets:[],sourceRows:0};const seen=new Map();
  const date1904=wb.Workbook?.WBProps?.date1904;
- for(const name of wb.SheetNames){const ws=wb.Sheets[name];if(!ws){result.errors.push(name+': Worksheet could not be read.');continue;}const at=(c,r)=>ws[c+r]?.v;const source=key(at('D',13))==='family name'&&key(at('E',13))==='first name';
- if(!source)continue;
- const rowNums=[...new Set(Object.keys(ws).filter(k=>/^[DE]\d+$/.test(k)).map(k=>Number(k.replace(/\D/g,''))))].filter(r=>r>15&&(text(at('D',r))||text(at('E',r)))).sort((a,b)=>a-b);
+ for(const name of wb.SheetNames){const ws=wb.Sheets[name];if(!ws){result.errors.push(name+': Worksheet could not be read.');continue;}const at=(c,r)=>ws[c+r]?.v;const header=[10,13].find(r=>key(at('D',r))==='family name'&&key(at('E',r))==='first name');
+ if(!header)continue;
+ const dashboardLayout=key(at('BU',header))==='atorvastatin'&&key(at('BV',header))==='hydrochlorothiazide';
+ const tagposLayout=key(at('BV',header))==='metformin'&&key(at('BW',header))==='gliclazide';
+ if(!dashboardLayout&&!tagposLayout){result.errors.push(name+': Unsupported medication headers. Check columns BT:BX.');continue;}
+ const rowNums=[...new Set(Object.keys(ws).filter(k=>/^[DE]\d+$/.test(k)).map(k=>Number(k.replace(/\D/g,''))))].filter(r=>r>header+2&&(text(at('D',r))||text(at('E',r)))).sort((a,b)=>a-b);
  if(!rowNums.length)continue;if(rowNums.length>50000)throw Error('A worksheet may contain at most 50,000 patient rows.');
- const month=MONTHS.indexOf(text(at('V',5)).toUpperCase())+1,year=Number(at('BI',5));
+ const month=MONTHS.indexOf(text(at('V',header-8)).toUpperCase())+1,year=Number(at('BI',header-8));
  const period=month&&year>=1900&&year<=2200?year+'-'+String(month).padStart(2,'0'):'';
- result.sheets.push({name,rows:rowNums.length,period,facility:text(at('E',7))});
+ result.sheets.push({name,rows:rowNums.length,period,facility:text(at('E',header-6))});
  for(const r of rowNums){result.sourceRows++;const label=name+' row '+r;
  try{
  const warnings=[];const val=c=>at(c,r);const flag=(start,end)=>{let yes=false;for(let c=g.XLSX.utils.decode_col(start);c<=g.XLSX.utils.decode_col(end);c++){const v=val(g.XLSX.utils.encode_col(c));if(v==null||v==='')continue;if(v!==0&&v!==1&&v!=='0'&&v!=='1')throw Error('Expected 0 or 1 in '+g.XLSX.utils.encode_col(c)+'.');if(Number(v)===1)yes=true;}return yes;};
@@ -33,9 +36,9 @@ function parseWorkbook(wb){
  const weightKg=val('AH')==null||val('AH')===''?null:Number(val('AH')),heightM=val('AI')==null||val('AI')===''?null:Number(val('AI'));
  if(weightKg&&heightM){const bmi=weightKg/heightM**2;const calculated=bmi<18.5?'underweight':bmi<23?'normal':bmi<25?'overweight':'obese';if(!bmiClass)bmiClass=calculated;else if(calculated!==bmiClass)warnings.push('Recorded BMI category differs from calculated category; source category retained.');}
  const source=(pocket,facility)=>pocket&&facility?'both':pocket?'out-of-pocket':facility?'facility':'';
- const meds={};for(const [c,k] of [['BP','amlodipine5'],['BQ','amlodipine10'],['BR','losartan50'],['BS','losartan100'],['BT','simvastatin'],['BV','metformin'],['BW','gliclazide'],['BY','insulinR'],['BZ','insulinNPH'],['CA','insulin7030']])meds[k]=val(c)==null||val(c)===''?0:Number(val(c));
+ const meds={};for(const [c,k] of [['BP','amlodipine5'],['BQ','amlodipine10'],['BR','losartan50'],['BS','losartan100'],['BT','simvastatin'],...(dashboardLayout?[['BU','atorvastatin'],['BV','hydrochlorothiazide'],['BW','metformin'],['BX','gliclazide']]:[['BV','metformin'],['BW','gliclazide']]),['BY','insulinR'],['BZ','insulinNPH'],['CA','insulin7030']])meds[k]=val(c)==null||val(c)===''?0:Number(val(c));
  // These source dose columns have no separate field in the municipal schema.
- if(Number(val('BU'))||Number(val('BX')))throw Error('Simvastatin 40 mg / Gliclazide 80 mg needs manual mapping; no medication columns were shifted.');
+ if(!dashboardLayout&&(Number(val('BU'))||Number(val('BX'))))throw Error('Simvastatin 40 mg / Gliclazide 80 mg needs manual mapping; no medication columns were shifted.');
  const notes=['Imported from '+name+', row '+r+'.',...warnings,text(val('CB'))].filter(Boolean).join('\n');
  const a={id:'xls-a-'+hash(p.id+'|'+date),patientId:p.id,date,datePrecision:precision,age,smoker:flag('R','U'),bingeDrinker:flag('V','Y'),inactive:flag('Z','AC'),unhealthyDiet:flag('AD','AG'),weightKg,heightM,bmiClass,hypertension:flag('AR','AU'),diabetes:flag('AV','AY'),htnSource:source(flag('AZ','BC'),flag('BH','BK')),dmSource:source(flag('BD','BG'),flag('BL','BO')),medications:meds,remarks:notes,nextVisit:''};
  const np=g.PhilDB.validateRecord('patients',p),na=g.PhilDB.validateRecord('assessments',a);
@@ -47,7 +50,7 @@ function parseWorkbook(wb){
  }catch(error){result.errors.push(label+': '+error.message);}
  }
  }
- if(!result.sheets.length)result.errors.push('No populated PhilPEN masterlist found. Expected FAMILY NAME at D13, FIRST NAME at E13, and data from row 16. Use the supplied masterlist layout.');
+ if(!result.sheets.length)result.errors.push('No populated PhilPEN masterlist found. Expected FAMILY NAME / FIRST NAME on row 10 or 13 and data three rows below. Use the supplied masterlist layout.');
  return result;
 }
 async function readFile(file){if(!/\.(xlsx|xls)$/i.test(file.name))throw Error('Choose an .xlsx or .xls file.');if(file.size>30*1024*1024)throw Error('Excel file must be 30 MB or smaller.');if(!g.XLSX)throw Error('Excel reader is missing. Keep js/vendor with the app.');const wb=g.XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:false,cellFormula:false,cellHTML:false});return parseWorkbook(wb);}

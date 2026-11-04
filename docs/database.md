@@ -72,3 +72,7 @@ Actual exports include all settings fields. Import requires all five arrays and 
 `PhilDB.importRecords({patients, assessments}, {once?: marker})` validates both tables before an atomic transaction. It adds new records, matches patients by normalized identity, remaps visit foreign keys, skips existing same-date visits, retains existing edits and logs the batch. A failed linked record rolls back the whole transaction. A one-time marker in audit prevents starter rows being re-added on every load.
 
 Assessments support optional `datePrecision` (`day` by default, or `month`). Month-only imports use YYYY-MM-01 internally and are displayed/exported as a reporting month. Backups preserve precision and source remarks.
+
+## NCD assessment fields
+
+`riskAssessed` is boolean and defaults to true for legacy rows. `htnMedicationProvided` and `dmMedicationProvided` are nullable booleans; null preserves legacy inference, true/false are explicit values. A true value requires the corresponding condition; false requires an empty source. Settings include optional `viber`. Normalization supplies defaults when reading old backups; existing saved records remain valid without destructive migration. These fields are preserved by JSON backup/restore and ENCOUNTERS exports.
