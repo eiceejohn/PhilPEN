@@ -313,10 +313,7 @@
     return { name: 'NCD INDICATORS', rows: [top, sex, columns, ...data, sumRows(data, 61)], columns: 61, headerRows: [1, 2], totalRows: [data.length + 4], heights: { 1: 118, 2: 25, 3: 20 }, widths: [[1, 1, 25], [2, 61, 10]], merges, freeze: 3 };
   }
 
-  function makeMedicationSheet(context) {
-    const top = ['Barangay', 'Total Screen', 'Hypertension', '', '', '', 'Diabetes', '', '', '', 'Amlodipine', '', 'Losartan', '', 'Simvastatin', 'Atorvastatin', 'Hydrochlorothiazide', 'Metformin', 'Gliclazide', 'Insulin', '', '', 'Current BP Apparatus (Manual)', 'Current BP Apparatus (Automatic)', 'Current Glucometers', 'Current Glucose Test Strips'];
-    const second = ['', '', 'Male', '', 'Female', '', 'Male', '', 'Female'];
-    const third = ['', '', '20–59 yrs.', '≥60 yrs.', '20–59 yrs.', '≥60 yrs.', '20–59 yrs.', '≥60 yrs.', '20–59 yrs.', '≥60 yrs.', '5 mg', '10 mg', '50 mg', '100 mg', '', '', '', '', '', 'R', 'NPH', '70/30'];
+  function medicationTableFromContext(context) {
     const rows = context.names.map(name => {
       const people = context.summary.people.filter(assessment => assessment.patient.barangay === name);
       const row = [name, people.filter(a => a.riskAssessed !== false).length, ...Array(24).fill(0)];
@@ -332,6 +329,16 @@
     });
     const totals = sumRows(rows, 26);
     for (let col = 22; col < 26; col += 1) if (!rows.some(row => row[col] !== '')) totals[col] = '';
+    return {rows,totals};
+  }
+
+  function medicationTable(input) { return medicationTableFromContext(normalizedContext(input)); }
+
+  function makeMedicationSheet(context) {
+    const top = ['Barangay', 'Total Screen', 'Hypertension', '', '', '', 'Diabetes', '', '', '', 'Amlodipine', '', 'Losartan', '', 'Simvastatin', 'Atorvastatin', 'Hydrochlorothiazide', 'Metformin', 'Gliclazide', 'Insulin', '', '', 'Current BP Apparatus (Manual)', 'Current BP Apparatus (Automatic)', 'Current Glucometers', 'Current Glucose Test Strips'];
+    const second = ['', '', 'Male', '', 'Female', '', 'Male', '', 'Female'];
+    const third = ['', '', '20–59 yrs.', '≥60 yrs.', '20–59 yrs.', '≥60 yrs.', '20–59 yrs.', '≥60 yrs.', '20–59 yrs.', '≥60 yrs.', '5 mg', '10 mg', '50 mg', '100 mg', '', '', '', '', '', 'R', 'NPH', '70/30'];
+    const {rows,totals} = medicationTableFromContext(context);
     const merges = ['A1:A3', 'B1:B3', 'C1:F1', 'G1:J1', 'C2:D2', 'E2:F2', 'G2:H2', 'I2:J2', 'K1:L2', 'M1:N2', 'O1:O3', 'P1:P3', 'Q1:Q3', 'R1:R3', 'S1:S3', 'T1:V2', 'W1:W3', 'X1:X3', 'Y1:Y3', 'Z1:Z3'];
     return { name: 'NCD MEDICATION', rows: [top, second, third, ['Medication columns K–V sum the recorded daily frequencies (1–3); equipment is the current inventory.'], ...rows, totals], columns: 26, headerRows: [1, 2, 3], totalRows: [rows.length + 5], heights: { 1: 42, 2: 30, 3: 28, 4: 34 }, widths: [[1, 1, 25], [2, 10, 11], [11, 22, 13], [23, 26, 16]], merges: [...merges, 'A4:Z4'], freeze: 4 };
   }
@@ -473,5 +480,5 @@
     return { ...downloadBlob(blob, 'PhilPEN-report-' + filePeriod(context.filters) + '.xlsx'), summary: context.summary };
   }
 
-  global.PhilReports = Object.freeze({ summarize, indicatorLabels: INDICATOR_LABELS, metricFlags, exportWorkbook, buildWorkbookBytes, exportPatientsCSV, parsePatientsCSV, downloadPatientTemplate, exportIndicatorsCSV, exportEncountersCSV, encounterAge, frequency, treated, riskLabels: RISK_LABELS, medicationColumns: MEDICATIONS, patientFields: PATIENT_FIELDS, toCSV });
+  global.PhilReports = Object.freeze({ summarize, medicationTable, indicatorLabels: INDICATOR_LABELS, metricFlags, exportWorkbook, buildWorkbookBytes, exportPatientsCSV, parsePatientsCSV, downloadPatientTemplate, exportIndicatorsCSV, exportEncountersCSV, encounterAge, frequency, treated, riskLabels: RISK_LABELS, medicationColumns: MEDICATIONS, patientFields: PATIENT_FIELDS, toCSV });
 })(typeof window !== 'undefined' ? window : globalThis);

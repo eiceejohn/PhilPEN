@@ -8,8 +8,9 @@ Source: PhilPEN-Dashboard (1).xlsx, reviewed 2026-11-04. The workbook remains un
 | NCD INDICATORS P:W / AT:BA | Hypertension; medication provided; facility; out of pocket | Added independent medication-provided status; retained condition and source fields. |
 | NCD INDICATORS X:AE / BB:BI | Type II diabetes; medication provided; facility; out of pocket | Added independent medication-provided status; retained condition and source fields. |
 | Male/female × ages 20–59/60+ | Derived from registered sex and assessment age | All 60 report columns now visible in the screen matrix. |
-| NCD MEDICATION K:V | Amlodipine 5/10 mg, Losartan 50/100 mg, Simvastatin, Atorvastatin, Hydrochlorothiazide, Metformin, Gliclazide, Insulin R/NPH/70-30 | All 12 fields retained, now also available through a dedicated medication screen with edit controls and totals. |
-| NCD MEDICATION W:Z | Manual/automatic BP apparatus, glucometer, test strips | Already covered in Equipment and exports. |
+| NCD MEDICATION A:J | Barangay, total screened, HTN and DM split by sex and ages 20–59/60+ | Visible in the 26-column barangay medication matrix, using the Excel export calculations. |
+| NCD MEDICATION K:V | Amlodipine 5/10 mg, Losartan 50/100 mg, Simvastatin, Atorvastatin, Hydrochlorothiazide, Metformin, Gliclazide, Insulin R/NPH/70-30 | All 12 medicines have separate columns in the barangay matrix, with totals and per-patient edit controls below. |
+| NCD MEDICATION W:Z | Manual/automatic BP apparatus, glucometer, test strips | Visible in the medication matrix as well as Equipment and exports; Update inventory opens the existing editor. |
 | MUNICIPAL INFO | Province, LGU, population, targets, contact, phone, Viber, email | Added Viber field and export. Population 200,900 and target 40% match the baseline. |
 | Submission register | Patient identity, birth date, sex, age, barangay, address, PhilHealth, visit date, weight/height, findings, medicines, remarks | Covered by registry/assessment; updated import accepts headers on row 10 as well as row 13. |
 | Legend | Facilities, barangays, months and target population reference | Already available through reference seed, filters and report exports. |

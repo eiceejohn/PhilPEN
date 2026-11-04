@@ -48,3 +48,11 @@ Updated branding, surfaces, charts, focus states, avatars, favicon and Excel rep
 - Added sticky patient/action columns, sticky two-row headers, horizontal/keyboard scrolling and group jump buttons. Column position survives search and pagination.
 - Browser verified 42 field headers plus patient/actions, 44 cells per row, medicine values for a populated record, retained horizontal position across paging/search, empty-period and populated-period filtering, and mobile layout without page overflow. No browser errors.
 - Presentation-only change; existing database records, assessment save logic and report/export calculations retained.
+
+## 2026-11-04 — medication barangay matrix
+
+- Added all 26 columns from the NCD MEDICATION screenshot in workbook order: barangay, total screened, eight condition age/sex columns, 12 medicines and four inventory columns.
+- Shared aggregation between the on-screen table and Excel export; all 40 barangay rows and the total row matched exactly in the XLSX read-back test.
+- Passed source counts, all medication totals, month/barangay filters, recorded-zero versus missing equipment, and current-inventory independence from period filters. Existing reporting regression tests passed.
+- Browser checks confirmed 26 cells per row, Tagpos values, blank-period values, group jump controls, inventory editor access, and desktop/mobile layout. At a 375-pixel content viewport the page had no horizontal overflow; the table scrolled within its panel with the barangay column fixed. No browser errors.
+- No patient data or inventory was changed during this verification.

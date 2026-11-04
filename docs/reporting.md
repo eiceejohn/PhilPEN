@@ -17,6 +17,10 @@ The reports use the field order in the supplied **PhilPEN-Dashboard.xlsx**. The 
 - Equipment values are current inventory at export time, independent of the period filter. Blank means no inventory has been recorded; zero means a recorded zero.
 - Barangay demographic and target baselines retain the source workbook's values. For the register header, FHSIS target is eligible population × saved target proportion, rounded to a whole person.
 
+## Medication page
+
+The on-screen barangay matrix contains all 26 NCD MEDICATION columns (A:Z) in workbook order, with the same three-level headings. It uses `PhilReports.medicationTable(context)` and shares its rows and totals with the Excel exporter. Period and barangay filters apply to patient counts and medication frequencies; equipment remains the current inventory. Blank inventory remains blank in Excel and displays as an em dash in the UI; zero remains zero. Inventory totals sum only recorded values and remain blank if none are recorded. The supplementary patient table provides links to edit each assessment.
+
 ## Excel workbook
 
 The download contains six sheets:

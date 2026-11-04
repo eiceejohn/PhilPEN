@@ -33,3 +33,26 @@
 .assessment-table .tag{font-size:10px}
 @media(max-width:760px){.assessment-column-tools{padding:14px}.assessment-column-tools .actions{gap:6px}.assessment-grid{max-height:65vh}.assessment-table .assessment-patient{min-width:155px;width:155px;max-width:155px;padding:10px}.assessment-table .assessment-patient .person-avatar{display:none}.assessment-table .assessment-actions{min-width:72px;width:72px;max-width:72px;padding:10px 6px}.assessment-table th,.assessment-table td{min-width:125px;padding:10px}}
 @media print{.assessment-column-tools{display:none}.assessment-grid{max-height:none;overflow:auto}.assessment-table .assessment-patient,.assessment-table .assessment-actions,.assessment-table thead th{position:static}.assessment-table .assessment-actions{display:none}}
+
+/* Excel-aligned barangay medication matrix, A:Z. */
+.medication-column-tools{margin-top:16px}
+.medication-grid-wrap{max-width:100%;max-height:65vh;position:relative;overscroll-behavior-x:contain;scrollbar-color:#93c5fd #eff6ff;border-bottom:1px solid var(--line)}
+.medication-grid-wrap:focus-visible{outline-offset:-3px}
+.medication-summary-table{table-layout:fixed;width:3000px;border-collapse:separate;border-spacing:0;font-variant-numeric:tabular-nums}
+.medication-summary-table .medication-barangay-col{width:180px}
+.medication-summary-table .medication-number-col{width:100px}
+.medication-summary-table .medication-wide-col{width:140px}
+.medication-summary-table th,.medication-summary-table td{padding:10px 12px;border-right:1px solid #dbe5f1;border-bottom:1px solid #e7eef6;text-align:center;line-height:1.5;white-space:normal;overflow-wrap:break-word}
+.medication-summary-table thead th{position:sticky;top:0;z-index:3;color:#1d4ed8;background:#e8f1ff;text-transform:none;font-size:10px;letter-spacing:0;height:44px}
+.medication-summary-table thead tr:nth-child(2) th{top:44px;height:32px;background:#eff6ff}
+.medication-summary-table thead tr:nth-child(3) th{top:76px;height:38px;background:#f6f9ff}
+.medication-summary-table .medication-barangay{position:sticky;left:0;z-index:2;background:#fff;text-align:left;box-shadow:3px 0 5px #0f172a0a;font-weight:600;text-transform:none;font-size:11px;letter-spacing:0}
+.medication-summary-table thead .medication-barangay{z-index:5;background:#e8f1ff}
+.medication-summary-table tbody tr:nth-child(even) td,.medication-summary-table tbody tr:nth-child(even) .medication-barangay{background:#f7faff}
+.medication-summary-table tbody tr:hover td,.medication-summary-table tbody tr:hover .medication-barangay{background:#eaf2ff}
+.medication-summary-table .medication-inventory{background:#f8fbff}
+.medication-summary-table tfoot th,.medication-summary-table tfoot td{position:sticky;bottom:0;z-index:3;background:#dbeafe;color:#1e3a8a;font-weight:700;border-top:2px solid #93c5fd}
+.medication-summary-table tfoot .medication-barangay{z-index:4;background:#dbeafe}
+.medication-table-note{font-size:10px;line-height:1.8;color:var(--muted);padding:14px 20px;background:#f8fbff}
+@media(max-width:760px){.medication-summary-table .medication-barangay-col{width:130px}.medication-table-note{padding:12px 14px}.medication-summary-table th,.medication-summary-table td{padding:9px 10px}}
+@media print{.medication-column-tools{display:none}.medication-grid-wrap{max-height:none;overflow:auto}.medication-summary-table thead th,.medication-summary-table .medication-barangay,.medication-summary-table tfoot td,.medication-summary-table tfoot th{position:static}}
