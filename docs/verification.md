@@ -41,3 +41,10 @@ Updated branding, surfaces, charts, focus states, avatars, favicon and Excel rep
 - Added header detection for dashboard row 10 and Tagpos row 13; medication mappings follow the actual headers, including dashboard Atorvastatin and Hydrochlorothiazide.
 - Passed all 60 age/sex indicator cell checks, 12 dashboard medication column checks, legacy defaults, invalid statuses, Viber/ENCOUNTERS export checks, Tagpos regression and existing report tests.
 - All 32 isolated native IndexedDB checks passed, including new-field backup/restore and medication persistence. Browser preview verified medication layout, 15 indicator rows, source counts, live group changes, and validation. A discard dialog blocked cleanup of the unsaved form test tab; no patient changes were committed.
+
+## 2026-11-04 — complete assessment table columns
+
+- Replaced the seven-column assessment list with 44 visible columns, grouped into patient/visit, risk/BMI, hypertension/diabetes, all 12 medicines, and follow-up/remarks.
+- Added sticky patient/action columns, sticky two-row headers, horizontal/keyboard scrolling and group jump buttons. Column position survives search and pagination.
+- Browser verified 42 field headers plus patient/actions, 44 cells per row, medicine values for a populated record, retained horizontal position across paging/search, empty-period and populated-period filtering, and mobile layout without page overflow. No browser errors.
+- Presentation-only change; existing database records, assessment save logic and report/export calculations retained.

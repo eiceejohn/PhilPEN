@@ -11,3 +11,25 @@
 
 /* Supplied municipal NCD identity and Excel review. */
 .brand-logo{width:56px;height:56px;object-fit:contain;border-radius:50%;background:white;flex-shrink:0}.import-summary{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0}.import-summary .tag{font-size:13px}.import-review{max-height:240px;overflow:auto;border:1px solid var(--border);border-radius:12px;padding:14px}.import-review summary{cursor:pointer;font-weight:600}.import-review pre{white-space:pre-wrap;font:inherit;font-size:12px;line-height:1.6}.source-download{display:inline-flex;align-items:center;gap:8px}.brand{gap:10px}
+
+/* Complete assessment register: all fields, grouped headers, fixed identity/actions. */
+.assessment-column-tools{padding:16px 20px;border-bottom:1px solid var(--line);background:#f8fbff;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.assessment-column-tools strong{display:block;font-size:12px;color:var(--ink)}
+.assessment-column-tools span{display:block;font-size:10px;color:var(--muted);margin-top:5px;line-height:1.6}
+.assessment-grid{max-width:100%;max-height:65vh;position:relative;overscroll-behavior-x:contain;scrollbar-color:#93c5fd #eff6ff;scrollbar-width:auto;border-bottom:1px solid var(--line)}
+.assessment-grid:focus-visible{outline-offset:-3px}
+.assessment-table{width:max-content;min-width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed}
+.assessment-table th,.assessment-table td{min-width:140px;max-width:190px;width:140px;padding:12px 14px;border-right:1px solid #edf2f7;white-space:normal;overflow-wrap:anywhere;line-height:1.6;box-sizing:border-box}
+.assessment-table thead th{position:sticky;top:36px;z-index:3;background:#f8fafc;height:62px;font-size:10px;letter-spacing:.1px;text-transform:none;color:#475569}
+.assessment-table .assessment-group-head th{top:0;height:36px;background:#eff6ff;color:#1d4ed8;font-size:10px;letter-spacing:.5px;text-transform:uppercase;padding-top:8px;padding-bottom:8px}
+.assessment-table .assessment-patient{position:sticky;left:0;min-width:230px;width:230px;max-width:230px;background:#fff;box-shadow:3px 0 5px #0f172a0a;z-index:2}
+.assessment-table thead .assessment-patient{z-index:5;top:0}
+.assessment-table tbody .assessment-patient{text-transform:none;letter-spacing:normal;font-weight:400;border-bottom:1px solid #f1f5f9;color:var(--ink)}
+.assessment-table .assessment-patient .table-link{text-align:left;white-space:normal;line-height:1.6}
+.assessment-table .assessment-actions{position:sticky;right:0;min-width:88px;width:88px;max-width:88px;background:#fff;z-index:2;box-shadow:-3px 0 5px #0f172a0a}
+.assessment-table thead .assessment-actions{z-index:5;top:0}
+.assessment-table tbody tr:hover .assessment-patient,.assessment-table tbody tr:hover .assessment-actions{background:#f8fafc}
+.assessment-table .assessment-wide{min-width:300px;max-width:300px;width:300px;white-space:pre-wrap}
+.assessment-table .tag{font-size:10px}
+@media(max-width:760px){.assessment-column-tools{padding:14px}.assessment-column-tools .actions{gap:6px}.assessment-grid{max-height:65vh}.assessment-table .assessment-patient{min-width:155px;width:155px;max-width:155px;padding:10px}.assessment-table .assessment-patient .person-avatar{display:none}.assessment-table .assessment-actions{min-width:72px;width:72px;max-width:72px;padding:10px 6px}.assessment-table th,.assessment-table td{min-width:125px;padding:10px}}
+@media print{.assessment-column-tools{display:none}.assessment-grid{max-height:none;overflow:auto}.assessment-table .assessment-patient,.assessment-table .assessment-actions,.assessment-table thead th{position:static}.assessment-table .assessment-actions{display:none}}

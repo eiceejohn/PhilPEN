@@ -13,6 +13,7 @@ Walang kailangang i-install. Walang server, internet connection, account, CDN o 
 ## Paano gamitin
 
 - **Patients:** magdagdag o mag-edit ng patient, pagkatapos ay mag-record ng assessment. May hiwalay na assessment history bawat patient.
+- **Assessment records table:** lahat ng 44 columns ay visible sa horizontally scrollable table: patient/visit details, NCD indicators, measurements, 12 medicines, follow-up at remarks. Gamitin ang field-group buttons para mabilis lumipat; naka-fix ang patient at edit/delete columns. Nananatili ang column position habang nag-search o lumilipat ng page.
 - **Assessments:** ilagay ang petsa, risk factors, measurements, hypertension/diabetes status at gamot na kasalukuyang iniinom. Kapag kumpleto ang weight at height, awtomatikong kukuwentahin ang BMI category gamit ang source workbook thresholds. Kung kulang ang measurements, puwedeng piliin ang naitalang category. Ang medicine entry ay frequency kada araw, hindi bilang ng stock o reseta.
 - **NCD indicators:** may explicit Risk assessed at Yes/No medication-provided fields para sa HTN at DM. May live preview ng lahat ng 15 indicator columns; automatic ang age/sex group. Sa old records, retained ang dating treatment inference hanggang maglagay ng explicit Yes/No.
 - **Medications:** hiwalay na page para sa lahat ng 12 workbook medication fields, per-patient editing at frequency totals.

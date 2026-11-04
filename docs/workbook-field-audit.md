@@ -17,3 +17,5 @@ Source: PhilPEN-Dashboard (1).xlsx, reviewed 2026-11-04. The workbook remains un
 The dashboard medication layout has BU=Atorvastatin, BV=Hydrochlorothiazide, BW=Metformin and BX=Gliclazide. Tagpos uses different columns; mapping is selected from headers, never from the filename. Blank template rows and aggregate sheets are not converted into artificial patient records.
 
 The 15 unique indicators repeat across two age groups and two sexes. They are not 60 separate inputs per patient. Explicit medication-provided status is distinct from medicine frequency. Existing rows preserve their inferred status until edited.
+
+All fields are now also displayed directly in the Assessment records table (44 columns including patient and row actions), with grouped headings and fixed patient/action columns.
