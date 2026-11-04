@@ -6,18 +6,21 @@
   <meta name="theme-color" content="#2563eb">
   <meta name="description" content="PhilPEN community health registry and reporting workspace for Binangonan.">
   <title>PhilPEN · Community health workspace</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%232563eb'/%3E%3Cpath d='M27 13h10v14h14v10H37v14H27V37H13V27h14z' fill='white'/%3E%3C/svg%3E">
+  <link rel="icon" href="assets/logo.jpg" type="image/jpeg">
   <link rel="stylesheet" href="css/styles.css">
   <script src="data/seed.js" defer></script>
   <script src="js/db.js" defer></script>
   <script src="js/reports.js" defer></script>
   <script src="js/ui.js" defer></script>
+  <script src="js/vendor/xlsx.full.min.js" defer></script>
+  <script src="js/excel-import.js" defer></script>
+  <script src="data/tagpos-september-2026.js" defer></script>
   <script src="js/app.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   <aside class="sidebar" id="sidebar">
-    <a class="brand" href="#dashboard" aria-label="PhilPEN overview"><span class="brand-mark">✚</span><span>PhilPEN<small>COMMUNITY HEALTH</small></span></a>
+    <a class="brand" href="#dashboard" aria-label="PhilPEN overview"><img class="brand-logo" src="assets/logo.jpg" alt="Binangonan NCD prevention and control logo" width="56" height="56"><span>PhilPEN<small>COMMUNITY HEALTH</small></span></a>
     <div class="workspace-label"><span class="workspace-avatar">B</span><div id="workspace-name">Binangonan<small>Municipal health workspace</small></div><span class="status-dot"></span></div>
     <p class="nav-label">WORKSPACE</p>
     <nav id="navigation" aria-label="Main navigation"></nav>
@@ -32,6 +35,7 @@
   <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
   <input type="file" id="restore-input" accept=".json,application/json" hidden>
   <input type="file" id="csv-input" accept=".csv,text/csv" hidden>
+  <input type="file" id="excel-input" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" hidden>
   <noscript>This application needs JavaScript. Enable JavaScript in your browser, then reopen index.html.</noscript>
 </body>
 </html>

@@ -23,3 +23,14 @@ This is a single-device browser-local database. It does not provide server synch
 ## Blue theme update · 3 November 2026
 
 Updated branding, surfaces, charts, focus states, avatars, favicon and Excel report styles to blue and slate. Warning and error colors remain distinct. All CSS custom-property references resolve. Layout and data logic are unchanged. This color-only revision received static validation; live browser review was unavailable because Windows browser automation could not verify the current URL.
+
+## 2026-11-04 — logo, Tagpos data, Excel import
+
+- Supplied NCD logo installed as local brand image and favicon; blue theme retained.
+- Parsed the supplied workbook with the same bundled Excel reader used in the app: 404 patients, 404 assessments, 152 male and 252 female. Source sheet named June has September 2026 heading.
+- Reconciled source totals: 25 hypertension, 3 diabetes, 23 tobacco, 54 binge drinking, 34 inactive, 293 unhealthy diet, 8 overweight, 0 obese.
+- Kept source ages (76 differ from DOB-derived age). Marked 246 blank assessment dates as month-only; exports retain YYYY-MM instead of implying an exact visit day.
+- Passed native browser file-picker import, warning acknowledgment, duplicate reimport and reload persistence checks.
+- All 29 isolated native IndexedDB checks passed, including atomic linked imports, rollback, identity matching, preservation of existing edits and one-time starter loading.
+- Passed .xlsx/.xls parsing, malformed date, sex, barangay, measurement, medication and risk-flag rejection; month-only Excel export roundtrip; existing report regression checks.
+- Patient seed and unmodified original workbook included for public upload at the owner’s explicit request after disclosure of the patient data and repository visibility.

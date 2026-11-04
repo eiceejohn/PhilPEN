@@ -252,7 +252,7 @@
     const fields = ['id', 'patientId', 'date', 'lastName', 'firstName', 'middleName', 'suffix', 'sex', 'age', 'dob', 'barangay', 'address', 'philhealth', 'phone'];
     const rows = context.summary.assessments.map(assessment => {
       const patient = assessment.patient;
-      return [assessment.id, patient.id, assessment.date, patient.lastName, patient.firstName, patient.middleName, patient.suffix, patient.sex, assessment.age == null ? '' : assessment.age, patient.dob, patient.barangay, patient.address, patient.philhealth, patient.phone,
+      return [assessment.id, patient.id, assessment.datePrecision === 'month' ? assessment.date.slice(0,7) : assessment.date, patient.lastName, patient.firstName, patient.middleName, patient.suffix, patient.sex, assessment.age == null ? '' : assessment.age, patient.dob, patient.barangay, patient.address, patient.philhealth, patient.phone,
         ...['smoker', 'bingeDrinker', 'inactive', 'unhealthyDiet'].map(key => assessment[key] ? 1 : 0),
         assessment.weightKg == null ? '' : assessment.weightKg, assessment.heightM == null ? '' : assessment.heightM, assessment.bmiClass || '', assessment.hypertension ? 1 : 0, assessment.diabetes ? 1 : 0, assessment.htnSource || '', assessment.dmSource || '',
         ...MEDICATIONS.map(medication => frequency(assessment, medication[0])), assessment.remarks || '', assessment.nextVisit || ''];
@@ -362,7 +362,7 @@
     people.forEach((assessment, index) => {
       const patient = assessment.patient;
       const row = Array(81).fill('');
-      row[1] = excelDate(assessment.date); row[2] = index + 1;
+      row[1] = assessment.datePrecision === 'month' ? assessment.date.slice(0,7) : excelDate(assessment.date); row[2] = index + 1;
       row[3] = patient.lastName; row[4] = patient.firstName; row[5] = patient.middleName || ''; row[6] = patient.suffix || '';
       const sex = patient.sex === 'F' ? 1 : 0;
       row[7 + sex] = 1; totals[7 + sex] += 1;
@@ -404,6 +404,7 @@
       ['Counted population', 'Patients aged 20–59 or 60+ at the encounter, with recorded sex M/F. Age is saved at assessment or calculated from DOB and assessment date, never from today.'],
       ['One person per reporting period', 'NCD INDICATORS, NCD MEDICATION and the submission register use the latest assessment per patient within the selected period. For identical dates, updated/created time and assessment ID break ties.'],
       ['Patient demographics', 'Reports use the current patient name, sex and barangay. Corrections to the patient registry also change historical report labels and aggregates. Assessment age remains the saved age at that visit.'],
+      ['Month-only assessments', 'YYYY-MM means the exact visit day was not recorded. These visits use day 01 only for internal sorting and month filters.'],
       ['Encounter history', 'ENCOUNTERS includes every matching assessment, including follow-ups. It is separate from the deduplicated submission register.'],
       ['Uncounted latest records', context.summary.excluded], ['Assessed people', context.summary.screened], ['Recorded encounters', context.summary.assessments.length],
       ['Monthly trend', 'Each calendar month counts unique eligible patients independently. Summing monthly counts can exceed annual unique patients.'],
@@ -449,7 +450,7 @@
 
   function buildWorkbookBytes(input) {
     const context = normalizedContext(input), encounters = encounterTable(context);
-    const encounterRows = encounters.rows.map(row => row.map((value, index) => [2, 9, 38].includes(index) ? excelDate(value) : value));
+    const encounterRows = encounters.rows.map(row => row.map((value, index) => index === 2 && /^\d{4}-\d{2}$/.test(value) ? value : [2, 9, 38].includes(index) ? excelDate(value) : value));
     const sheets = [makeMunicipalSheet(context), makeIndicatorSheet(context), makeMedicationSheet(context), makeRegisterSheet(context),
       { name: 'ENCOUNTERS', rows: [encounters.headers, ...encounterRows], columns: encounters.headers.length, headerRows: [1], heights: { 1: 58 }, widths: [[1, 2, 24], [3, 3, 14], [4, 7, 18], [8, 9, 10], [10, 10, 14], [11, 12, 25], [13, 14, 22], [15, 37, 15], [38, 38, 35], [39, 39, 14]], freeze: 1, autoFilter: `A1:${columnName(encounters.headers.length)}${encounterRows.length + 1}` }, makeNotesSheet(context)];
     const files = [

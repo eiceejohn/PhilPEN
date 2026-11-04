@@ -17,3 +17,6 @@ node_modules/
 .DS_Store
 Thumbs.db
 work/
+
+# Explicitly requested supplied masterlist
+!data/TAGPOS-SEPTEMBER-RISK-PEN-MASTERLIST-2026.xlsx

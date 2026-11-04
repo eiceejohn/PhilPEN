@@ -49,3 +49,7 @@ This local edition has no authentication, server-side authorization, role separa
 A shared deployment needs a separate backend, an authenticated API, authorization policies, a centrally managed database and backup/recovery controls. A SQL schema file alone would not make a directly opened HTML page a shared database system. Keep the present data/report APIs separate from any later transport adapter so a backend can be introduced without mixing persistence into rendering logic.
 
 See `database.md` for record fields, method contracts and backup limits; `workbook-analysis.md` records source ranges and known formula defects.
+
+## Excel and starter data update
+
+`js/vendor/xlsx.full.min.js` is the locally bundled SheetJS CE reader (license included). `js/excel-import.js` owns source column mapping, date conversion and preview diagnostics. `data/tagpos-september-2026.js` contains the requested initial records; the unmodified original masterlist is retained beside it. `assets/logo.jpg` contains the supplied NCD brand image. All application scripts remain classic scripts and work directly from index.html.

@@ -125,6 +125,7 @@
         id: id,
         patientId: identifier(input.patientId, 'Patient ID'),
         date: date(input.date, 'Assessment date', true),
+        datePrecision: choice(input.datePrecision, 'Date precision', ['day', 'month'], 'day'),
         age: number(input.age, 'Age', 20, 120, true),
         smoker: bool(input.smoker, 'Smoking status'),
         bingeDrinker: bool(input.bingeDrinker, 'Binge drinking status'),
@@ -451,7 +452,32 @@
     });
   }
 
+
+  // One transaction for linked Excel records; existing records are never overwritten.
+  async function importRecords(input, options) {
+    options=options||{};
+    if(!input||!Array.isArray(input.patients)||!Array.isArray(input.assessments))fail('Invalid import batch.');
+    if(input.errors&&input.errors.length)fail('Resolve all Excel row errors before importing.');
+    if(input.patients.length>LIMITS.patients||input.assessments.length>LIMITS.assessments)fail('Import is too large.');
+    const patients=input.patients.map(p=>normalize('patients',p));
+    const assessments=input.assessments.map(a=>normalize('assessments',a));
+    const identity=p=>[p.lastName,p.firstName,p.middleName,p.suffix,p.sex,p.dob,p.barangay].map(v=>String(v||'').normalize('NFKC').trim().toLowerCase().replace(/\s+/g,' ')).join('|');
+    const marker=options.once?identifier(options.once):'';
+    return transact(['patients','assessments','audit'],'readwrite','Import Excel records',function(ctx){
+      function start(){ctx.request(ctx.table('patients').getAll(),function(existingPatients){ctx.request(ctx.table('assessments').getAll(),function(existingAssessments){
+        const ids=new Map(existingPatients.map(p=>[p.id,p]));const identities=new Map(existingPatients.map(p=>[identity(p),p]));const remap=new Map();
+        const counts={patients:0,assessments:0,skippedPatients:0,skippedAssessments:0};
+        for(const p of patients){const sameId=ids.get(p.id);if(sameId&&identity(sameId)!==identity(p))fail('A patient ID belongs to a different patient.');const existing=sameId||identities.get(identity(p));if(existing){remap.set(p.id,existing.id);counts.skippedPatients++;}else{ids.set(p.id,p);identities.set(identity(p),p);remap.set(p.id,p.id);ctx.table('patients').add(p);counts.patients++;}}
+        const visits=new Set(existingAssessments.map(a=>a.patientId+'|'+a.date));const visitIds=new Map(existingAssessments.map(a=>[a.id,a]));
+        for(const raw of assessments){const a=Object.assign({},raw,{patientId:remap.get(raw.patientId)||raw.patientId});const patient=ids.get(a.patientId);if(!patient)fail('Assessment references a missing patient.');if(patient.dob&&patient.dob>a.date)fail('Assessment precedes birth date.');const sameId=visitIds.get(a.id);if(sameId&&(sameId.patientId!==a.patientId||sameId.date!==a.date))fail('Assessment ID conflict.');const visit=a.patientId+'|'+a.date;if(sameId||visits.has(visit)){counts.skippedAssessments++;continue;}ctx.table('assessments').add(a);visits.add(visit);visitIds.set(a.id,a);counts.assessments++;}
+        const log=activity('import','database','',counts.patients+' patients and '+counts.assessments+' assessments added; existing records retained.');if(marker)log.id=marker;ctx.table('audit').put(log);ctx.result(counts);
+      });});}
+      if(marker)ctx.request(ctx.table('audit').get(marker),function(done){if(done)ctx.result({alreadyLoaded:true,patients:0,assessments:0});else start();});else start();
+    });
+  }
+
   window.PhilDB = Object.freeze({
+    importRecords: importRecords,
     init: init,
     all: all,
     get: get,

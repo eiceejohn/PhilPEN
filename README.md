@@ -24,6 +24,16 @@ Ang report XLSX ay may anim na sheets: **MUNICIPAL INFO**, **NCD INDICATORS**, *
 
 Ginagamit ng reports ang kasalukuyang patient name, sex at barangay. Kapag itinama ang mga ito sa registry, maa-update rin ang dating period reports. Nananatiling hiwalay ang petsa, edad at findings ng bawat saved assessment.
 
+## Excel import at Tagpos masterlist
+
+Sa **Patient registry → Import Excel**, pumili ng `.xlsx` o `.xls` na sumusunod sa supplied PhilPEN masterlist layout (FAMILY NAME at D13, FIRST NAME at E13, data from row 16). I-review ang bilang, preview at source notes bago pindutin ang **Import records**. Lahat ng populated matching worksheets ay binabasa. Blank templates at Legend ay nilalaktawan. Kapag may invalid row, walang ise-save hangga’t hindi naitatama ang file. Repeated imports skip matching patients and same-date visits; hindi nito pinapalitan ang existing edits. I-edit sa app ang existing record kung may correction.
+
+Sa supplied workbook, ang sheet na `June` ay may heading na **SEPTEMBER 2026**. May 158 exact assessment dates na September 1 at 246 blank assessment dates. Ang blank dates ay month-only records; internally ginagamit ang September 1 para sa sorting, pero month lang ang ipinapakita at ini-export. May 76 ages na hindi tugma sa birth date; pinanatili ang source age at may note sa assessment. Source BMI categories are retained.
+
+Kasama ang original Excel sa `data/` at may download link sa Settings. Ayon sa explicit request ng owner, kasama ang patient seed at original workbook sa public repository; publicly downloadable ang patient data. Browser edits after installation remain local and are not automatically uploaded.
+
+The offline Excel reader is SheetJS CE 0.20.3, bundled in `js/vendor/`, with its Apache 2.0 license. [Official browser documentation](https://docs.sheetjs.com/docs/getting-started/installation/standalone/).
+
 ## Saan naka-save ang data
 
 May tunay na **IndexedDB database** ang app, na nasa browser profile ng computer. Hindi ito SQL database o database file sa tabi ng `index.html`, at hindi awtomatikong nagsi-sync sa ibang computer o staff.
@@ -34,7 +44,7 @@ May patient information ang JSON at CSV/XLSX exports. Itago ang mga ito sa prote
 
 ## Ano ang galing sa Excel
 
-Naka-seed ang tunay na municipal settings at **40 barangays**. Ang eligible population ay **200,900** at ang original annual screening target ay **80,360 (40%)**. Walang populated patient record sa source workbook: ang 2,000 numbered rows ay blank template. Kaya empty ang patient database sa unang pagbukas.
+Naka-seed ang tunay na municipal settings at **40 barangays**. Ang eligible population ay **200,900** at ang original annual screening target ay **80,360 (40%)**. Ang original dashboard workbook ay blank patient template. Kasama na ngayon ang **404 patients at 404 assessments** mula sa Tagpos September 2026 masterlist. Idinadagdag ito sa database sa unang pagbukas ng updated app; existing records are retained.
 
 ## Files
 
@@ -46,6 +56,9 @@ Naka-seed ang tunay na municipal settings at **40 barangays**. Ang eligible popu
 | `js/ui.js` | Reusable rendering, navigation at presentation helpers |
 | `js/db.js` | IndexedDB storage, validation at backup/restore |
 | `js/reports.js` | Calculations, CSV import/export at XLSX report generation |
+| `js/excel-import.js` | Excel parsing, validation at masterlist column mapping |
+| `assets/logo.jpg` | Supplied NCD logo |
+| `data/tagpos-september-2026.js` | Initial patient and assessment data |
 | `data/seed.js` | Reference settings at barangay data |
 | `docs/` | Architecture, database API at workbook findings |
 

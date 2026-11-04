@@ -66,3 +66,9 @@ Indexes support assessment lookup by patient/date, patients by barangay, and act
 ```
 
 Actual exports include all settings fields. Import requires all five arrays and exactly one settings row. Supported maximum imported counts are 50,000 patients, 250,000 assessments, 10,000 equipment rows, one settings row, and 500,000 history entries. An import validates all rows before writing and checks assessment references against the resulting patient set. A failed import leaves the prior database intact. A successful import adds a `restore` event after importing the included history.
+
+## Excel imports
+
+`PhilDB.importRecords({patients, assessments}, {once?: marker})` validates both tables before an atomic transaction. It adds new records, matches patients by normalized identity, remaps visit foreign keys, skips existing same-date visits, retains existing edits and logs the batch. A failed linked record rolls back the whole transaction. A one-time marker in audit prevents starter rows being re-added on every load.
+
+Assessments support optional `datePrecision` (`day` by default, or `month`). Month-only imports use YYYY-MM-01 internally and are displayed/exported as a reporting month. Backups preserve precision and source remarks.
